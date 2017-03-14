@@ -27,3 +27,6 @@ About as simple as it gets...
 - `blacklist = [".gif", "intent/tweet", "badlink", etc...]` A blacklist of strings that we check every link against. If the link contains any of the strings in this list, it's discarded. Useful to avoid things that are not traffic-generator friendly like "Tweet this!" links or links to image files.
 
 - `userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3).......'` You guessed it, the user-agent our headless browser hands over to the web server. You can probably leave it set to the default, but feel free to change it. I would strongly suggest using a common/valid one or else you'll likely get rate-limited quick. 
+
+## Usage
+`python gen.py`
