@@ -1,78 +1,31 @@
 #!/usr/bin/python
 
-import requests, re, time, random
-
-
-clickDepth = 5 # how deep to browse from the rootURL
-minWait = 5 # minimum amount of time allowed between HTTP requests
-maxWait = 10 # maximum amount of time to wait between HTTP requests
-debug = False # set to True to enable useful console output
-
-# use this single item list to test how a site responds to this crawler
-# be sure to comment out the list below it.
-#rootURLs = ["https://digg.com/"] 
-
-rootURLs = [
-	"https://digg.com/",
-	"https://www.yahoo.com",
-	"https://www.reddit.com",
-	"http://www.cnn.com",
-	"http://www.ebay.com",
-	"https://en.wikipedia.org/wiki/Main_Page",
-	"https://austin.craigslist.org/"
-	]
-
-
-# items can be a URL "https://t.co" or simple string to check for "amazon"
-blacklist = [
-	"https://t.co", 
-	"t.umblr.com", 
-	"messenger.com", 
-	"itunes.apple.com", 
-	"l.facebook.com", 
-	"bit.ly", 
-	"mediawiki", 
-	".css", 
-	".ico", 
-	".xml", 
-	"intent/tweet", 
-	"twitter.com/share", 
-	"signup", 
-	"login", 
-	"dialog/feed?", 
-	".png", 
-	".jpg", 
-	".json", 
-	".svg", 
-	".gif", 
-	"zendesk",
-	"clickserve"
-	]  
-
-# must use a valid user agent or sites will hate you
-userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) ' \
-	'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36'
+import requests, re, time, random, config
 
 
 def doRequest(url):
 	global dataMeter
 	global goodRequests
 	global badRequests
-	sleepTime = random.randrange(minWait,maxWait)
+	sleepTime = random.randrange(config.minWait,config.maxWait)
 	
-	if debug:
+	if config.debug:
 		print "requesting: %s" % url
 	
-	headers = {'user-agent': userAgent}
-	r = requests.get(url, headers=headers)
+	headers = {'user-agent': config.userAgent}
 	
+	try:
+		r = requests.get(url, headers=headers)
+	except:
+		return False
+		
 	status = r.status_code
 	
 	pageSize = len(r.content)
 	dataMeter = dataMeter + pageSize
 
 	
-	if debug:
+	if config.debug:
 		print "Page size: %s" % pageSize
 		if ( dataMeter > 1000000 ):
 			print "Data meter: %s MB" % (dataMeter / 1000000)
@@ -81,17 +34,17 @@ def doRequest(url):
 	
 	if ( status != 200 ):
 		badRequests+=1
-		if debug:
+		if config.debug:
 			print "Response status: %s" % r.status_code
 		if ( status == 429 ):
-			if debug:
+			if config.debug:
 				print "We're making requests too frequently... sleeping longer..."
 			sleepTime+=30
 	else:
 		goodRequests+=1
 	
 	# need to sleep for random number of seconds!
-	if debug:
+	if config.debug:
 		print "Good requests: %s" % goodRequests
 		print "Bad reqeusts: %s" % badRequests
 		print "Sleeping for %s seconds..." % sleepTime
@@ -106,8 +59,8 @@ def getLinks(page):
 	
 	matches = re.findall(pattern,page.content)
 	
-	for match in matches: # check all matches against blacklist
-		if any(bl in match for bl in blacklist):
+	for match in matches: # check all matches against config.blacklist
+		if any(bl in match for bl in config.blacklist):
 			pass
 		else:
 			links.insert(0,match)
@@ -120,26 +73,32 @@ def browse(urls):
 		urlCount = len(urls)
 
 		page = doRequest(url)  # hit current root URL
-		links = getLinks(page) # extract links from page
-		linkCount = len(links)
-		
+		if page:
+			links = getLinks(page) # extract links from page
+			linkCount = len(links)
+		else:
+			if config.debug:
+				print "Error requesting %s" % url
+			continue
+			
+			
 		depth=0
-		while ( depth < clickDepth ):
-			if debug:
+		while ( depth < config.clickDepth ):
+			if config.debug:
 				print "------------------------------------------------------"
-				print "Blacklist: %s" % blacklist 
+				print "config.blacklist: %s" % config.blacklist 
 			# set the link count, which will change throughout the loop
 			linkCount = len(links)
 			if ( linkCount > 1): # make sure we have more than 1 link to use
 			
-				if debug:
+				if config.debug:
 					print "URL: %s / %s -- Depth: %s / %s" \
-						% (currURL,urlCount,depth,clickDepth)
+						% (currURL,urlCount,depth,config.clickDepth)
 					print "Choosing random link from total: %s" % linkCount
 					
 				randomLink = random.randrange(0,linkCount - 1)
 				
-				if debug:
+				if config.debug:
 					print "Link chosen: %s of %s" % (randomLink,linkCount)
 					
 				clickLink = links[randomLink]
@@ -147,6 +106,14 @@ def browse(urls):
 				try:
 					# browse to random link on rootURL
 					sub_page = doRequest(clickLink)
+					if sub_page:
+						checkLinkCount = len(getLinks(sub_page))
+					else:
+						if config.debug:
+							print "Error requesting %s" % url
+						break
+					
+					
 					checkLinkCount = len(getLinks(sub_page))
 
 					# make sure we have more than 1 link to pick from 
@@ -155,18 +122,18 @@ def browse(urls):
 						links = getLinks(sub_page)
 					else:
 						# else retry with current link list
-						if debug:
+						if config.debug:
 							print "Not enough links found! Found: %s  -- " \
 								"Going back up a level" % checkLinkCount
-						blacklist.insert(0,clickLink)
+						config.blacklist.insert(0,clickLink)
 						# remove the dead-end link from our list
 						del links[randomLink]
 				except:
-					if debug:
+					if config.debug:
 						print "Exception on URL: %s  -- " \
 							"removing from list and trying again!" % clickLink
-					# I need to expand more on exception type for debugging
-					blacklist.insert(0,clickLink)
+					# I need to expand more on exception type for config.debugging
+					config.blacklist.insert(0,clickLink)
 					# remove the dead-end link from our list
 					del links[randomLink] 
 					pass
@@ -176,14 +143,14 @@ def browse(urls):
 			else:
 				# we land here if we went down a path that dead-ends
 				# could implement logic to simply restart at same root
-				if debug:
+				if config.debug:
 					print "Hit a dead end...Moving to next Root URL"
-				blacklist.insert(0,clickLink)
-				depth = clickDepth 
+				config.blacklist.insert(0,clickLink)
+				depth = config.clickDepth 
 			
 		
 		currURL+=1 # increase rootURL iteration
-	if debug:
+	if config.debug:
 		print "Done."
 
 # initialize our global variables
@@ -196,8 +163,10 @@ while True:
 	print "----------------------------"
 	print "https://github.com/ecapuano/web-traffic-generator"
 	print ""
-	print "Clicking %s links deep into %s different root URLs, " % (clickDepth,len(rootURLs))
-	print "waiting between %s and %s seconds between requests. " % (minWait,maxWait)
+	print "Clicking %s links deep into %s different root URLs, " \
+		% (config.clickDepth,len(config.rootURLs))
+	print "waiting between %s and %s seconds between requests. " \
+		% (config.minWait,config.maxWait)
 	print ""
 	print "This script will run indefinitely. Ctrl+C to stop."
-	browse(rootURLs)
+	browse(config.rootURLs)
