@@ -28,5 +28,8 @@ About as simple as it gets...
 
 - `userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3).......'` You guessed it, the user-agent our headless browser hands over to the web server. You can probably leave it set to the default, but feel free to change it. I would strongly suggest using a common/valid one or else you'll likely get rate-limited quick. 
 
+## Dependencies
+Only thing you need and *might* not have is `requests`. Grab it with `sudo pip install requests`
+
 ## Usage
 `python gen.py`
