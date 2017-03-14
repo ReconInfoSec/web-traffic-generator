@@ -1,5 +1,12 @@
 #!/usr/bin/python
 
+#
+# written by @eric_capuano
+# https://github.com/ecapuano/web-traffic-generator
+#
+# published under MIT license :) do what you want.
+#
+
 import requests, re, time, random, config
 
 
