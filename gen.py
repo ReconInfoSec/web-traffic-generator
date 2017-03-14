@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
-import requests, re, time, random, os
-from sys import platform
+import requests, re, time, random
 
 
 clickDepth = 5 # how deep to browse from the rootURL
