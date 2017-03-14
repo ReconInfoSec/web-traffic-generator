@@ -6,6 +6,8 @@ Just a simple (poorly written) Python script that aimlessly "browses" the intern
 
 I created this as a noise generator to use for an Incident Response / Network Defense simulation. The only issue is that my simulation environment uses multiple IDS/IPS/NGFW devices that will not pass and log simple TCPreplays of canned traffic. I needed the traffic to be as organic as possible, essentially mimicking real users browsing the web. 
 
+Tested on Ubuntu 14.04 & 16.04 minimal, but should work on any system with Python installed.
+
 ## How it works
 About as simple as it gets...
 
@@ -29,7 +31,18 @@ About as simple as it gets...
 - `userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3).......'` You guessed it, the user-agent our headless browser hands over to the web server. You can probably leave it set to the default, but feel free to change it. I would strongly suggest using a common/valid one or else you'll likely get rate-limited quick. 
 
 ## Dependencies
-Only thing you need and *might* not have is `requests`. Grab it with `sudo pip install requests`
+Only thing you need and *might* not have is `requests`. Grab it with 
+```
+sudo pip install requests
+```
 
 ## Usage
-`python gen.py`
+Create your config file first: 
+```
+cp config.py.template config.py
+```
+
+Run the generator: 
+```
+python gen.py
+```
