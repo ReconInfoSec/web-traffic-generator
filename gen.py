@@ -24,6 +24,7 @@ def doRequest(url):
 	try:
 		r = requests.get(url, headers=headers)
 	except:
+		time.sleep(30) # else we'll enter 100% CPU loop in a net down situation
 		return False
 		
 	status = r.status_code
