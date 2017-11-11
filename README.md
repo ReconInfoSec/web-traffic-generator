@@ -46,3 +46,82 @@ Run the generator:
 ```
 python gen.py
 ```
+
+
+## Troubleshooting and debugging
+To get more deets on what is happening under the hood, change the Debug variable in `config.py` from `False` to `True`. This provides the following output...
+
+```
+Traffic generator started...
+----------------------------
+https://github.com/ecapuano/web-traffic-generator
+
+Clcking 5 links deep into 7 different root URLs,
+waiting between 5 and 10 seconds between requests.
+
+This script will run indefinitely. Ctrl+C to stop.
+requesting: https://digg.com/
+Page size: 388840
+Data meter: 388840 bytes
+Good requests: 1
+Bad reqeusts: 0
+Sleeping for 6 seconds...
+------------------------------------------------------
+config.blacklist: ['https://t.co', 't.umblr.com', 'messenger.com', 'itunes.apple.com', 'l.facebook.com', 'bit.ly', 'mediawiki', '.css', '.ico', '.xml', 'intent/tweet', 'twitter.com/share', 'signup', 'login', 'dialog/feed?', '.png', '.jpg', '.json', '.svg', '.gif', 'zendesk', 'clickserve']
+URL: 1 / 7 -- Depth: 0 / 5
+Choosing random link from total: 221
+Link chosen: 64 of 221
+requesting: http://nautil.us/issue/54/the-unspoken/physics-has-demoted-mass
+Page size: 85012
+Data meter: 473852 bytes
+Good requests: 2
+Bad reqeusts: 0
+Sleeping for 7 seconds...
+------------------------------------------------------
+config.blacklist: ['https://t.co', 't.umblr.com', 'messenger.com', 'itunes.apple.com', 'l.facebook.com', 'bit.ly', 'mediawiki', '.css', '.ico', '.xml', 'intent/tweet', 'twitter.com/share', 'signup', 'login', 'dialog/feed?', '.png', '.jpg', '.json', '.svg', '.gif', 'zendesk', 'clickserve']
+URL: 1 / 7 -- Depth: 1 / 5
+Choosing random link from total: 16
+Link chosen: 0 of 16
+requesting: http://shop.nautil.us?utm_source=mainsite&utm_medium=popup&utm_campaign=springsale_2017
+Page size: 58467
+Data meter: 532319 bytes
+Good requests: 3
+Bad reqeusts: 0
+Sleeping for 5 seconds...
+------------------------------------------------------
+config.blacklist: ['https://t.co', 't.umblr.com', 'messenger.com', 'itunes.apple.com', 'l.facebook.com', 'bit.ly', 'mediawiki', '.css', '.ico', '.xml', 'intent/tweet', 'twitter.com/share', 'signup', 'login', 'dialog/feed?', '.png', '.jpg', '.json', '.svg', '.gif', 'zendesk', 'clickserve']
+URL: 1 / 7 -- Depth: 2 / 5
+Choosing random link from total: 93
+Link chosen: 88 of 93
+requesting: http://shop.nautil.us/rss.php?action=popularproducts&amp;type=rss
+Page size: 25106
+Data meter: 557425 bytes
+Good requests: 4
+Bad reqeusts: 0
+Sleeping for 6 seconds...
+------------------------------------------------------
+config.blacklist: ['https://t.co', 't.umblr.com', 'messenger.com', 'itunes.apple.com', 'l.facebook.com', 'bit.ly', 'mediawiki', '.css', '.ico', '.xml', 'intent/tweet', 'twitter.com/share', 'signup', 'login', 'dialog/feed?', '.png', '.jpg', '.json', '.svg', '.gif', 'zendesk', 'clickserve']
+URL: 1 / 7 -- Depth: 3 / 5
+Choosing random link from total: 18
+Link chosen: 15 of 18
+requesting: http://shop.nautil.us/may-june-2017/
+Page size: 62543
+Data meter: 619968 bytes
+Good requests: 5
+Bad reqeusts: 0
+Sleeping for 9 seconds...
+------------------------------------------------------
+config.blacklist: ['https://t.co', 't.umblr.com', 'messenger.com', 'itunes.apple.com', 'l.facebook.com', 'bit.ly', 'mediawiki', '.css', '.ico', '.xml', 'intent/tweet', 'twitter.com/share', 'signup', 'login', 'dialog/feed?', '.png', '.jpg', '.json', '.svg', '.gif', 'zendesk', 'clickserve']
+URL: 1 / 7 -- Depth: 4 / 5
+Choosing random link from total: 70
+Link chosen: 16 of 70
+requesting: http://shop.nautil.us/my-test/
+Page size: 206
+Data meter: 620174 bytes
+Good requests: 6
+Bad reqeusts: 0
+Sleeping for 7 seconds...
+^CException on URL: http://shop.nautil.us/my-test/  -- removing from list and trying again!
+```
+
+The last URL attempted provides a good example of when a particular URL throws an error. We simply add it to our `config.blacklist` array in memory, and continue browsing. This prevents a known bad URL from returning to the queue. 
