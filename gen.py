@@ -198,7 +198,7 @@ while True:
 	print("----------------------------")
 	print("https://github.com/ecapuano/web-traffic-generator")
 	print("")
-	print("Clcking %s links deep into %s different root URLs, " \
+	print("Clicking %s links deep into %s different root URLs, " \
 		% (config.clickDepth,len(config.rootURLs)))
 	print("waiting between %s and %s seconds between requests. " \
 		% (config.minWait,config.maxWait))
