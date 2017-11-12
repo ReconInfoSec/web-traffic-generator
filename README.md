@@ -8,6 +8,8 @@ I created this as a noise generator to use for an Incident Response / Network De
 
 Tested on Ubuntu 14.04 & 16.04 minimal, but should work on any system with Python installed.
 
+[![asciicast](https://asciinema.org/a/147170.png)](https://asciinema.org/a/147170)
+
 ## How it works
 About as simple as it gets...
 
