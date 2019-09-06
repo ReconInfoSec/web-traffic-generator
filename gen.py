@@ -61,11 +61,8 @@ def doRequest(url):
 
 
 	if config.debug:
-		print("Page size: %s" % pageSize)
-		if ( dataMeter > 1000000 ):
-			print("Data meter: %s MB" % (dataMeter / 1000000))
-		else:
-			print("Data meter: %s bytes" % dataMeter)
+		print("Page size: %s" % bytes2human(pageSize))
+		print("Data meter: %s" % bytes2human(dataMeter))
 
 	if ( status != 200 ):
 		badRequests+=1
@@ -86,6 +83,15 @@ def doRequest(url):
 
 	time.sleep(sleepTime)
 	return r
+
+def bytes2human(bytes):
+	power = 1024  # Change to 1000 if that is preferred
+	n = 0
+	units = {0: 'B', 1: 'KB', 2: 'MB', 3: 'GB', 4: 'TB', 5: 'PB', 6: 'EB', 7: 'ZB', 8: 'YB'}
+	while bytes > power:
+		bytes = float(bytes) / power
+		n +=1
+	return '{0:.2f} {1}'.format(bytes, units[n])
 
 def getLinks(page):
 	links=[]
