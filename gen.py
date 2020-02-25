@@ -18,7 +18,7 @@ except ImportError:
         MIN_DEPTH = 3   # dive at least this deep into each root URL
         MAX_WAIT = 10   # maximum amount of time to wait between HTTP requests
         MIN_WAIT = 5    # minimum amount of time allowed between HTTP requests
-        DEBUG = True    # set to True to enable useful console output
+        DEBUG = False    # set to True to enable useful console output
 
         # use this single item list to test how a site responds to this crawler
         # be sure to comment out the list below it.
@@ -156,7 +156,7 @@ def recursive_browse(url, depth):
 
         # sleep and then recursively browse
         sleep_time = random.randrange(config.MIN_WAIT, config.MAX_WAIT)
-        print("  Pausing for {} seconds...".format(sleep_time))
+        debug_print("  Pausing for {} seconds...".format(sleep_time))
         time.sleep(sleep_time)
 
         recursive_browse(random.choice(valid_links), depth - 1)
