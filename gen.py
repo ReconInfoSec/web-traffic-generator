@@ -6,13 +6,17 @@
 #
 # published under MIT license :) do what you want.
 #
-#20170714 shyft ADDED python 2.7 and 3.x compatibility and generic config
-#20200225 rarawls ADDED recursive, depth-first browsing, color stdout
-from __future__ import print_function 
-import requests, re, time, random 
+# 20170714 shyft ADDED python 2.7 and 3.x compatibility and generic config
+# 20200225 rarawls ADDED recursive, depth-first browsing, color stdout
+from __future__ import print_function
+import requests
+import re
+import time
+import random
 try:
     import config
 except ImportError:
+    
     class ConfigClass:  # minimal config incase you don't have the config.py
         MAX_DEPTH = 10  # dive no deeper than this for each root URL
         MIN_DEPTH = 3   # dive at least this deep into each root URL
@@ -22,22 +26,22 @@ except ImportError:
 
         # use this single item list to test how a site responds to this crawler
         # be sure to comment out the list below it.
-        #ROOT_URLS = ["https://digg.com/"] 
+        #ROOT_URLS = ["https://digg.com/"]
         ROOT_URLS = [
             "https://www.reddit.com"
-            ]
-
+        ]
 
         # items can be a URL "https://t.co" or simple string to check for "amazon"
         blacklist = [
             'facebook.com',
             'pinterest.com'
-            ]  
+        ]
 
         # must use a valid user agent or sites will hate you
         USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) ' \
             'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36'
-    config = ConfigClass 
+    config = ConfigClass
+
 
 class Colors:
     RED = '\033[91m'
@@ -187,4 +191,3 @@ if __name__ == "__main__":
         depth = random.choice(range(config.MIN_DEPTH, config.MAX_DEPTH))
 
         recursive_browse(random_url, depth)
-
