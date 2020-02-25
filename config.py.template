@@ -1,13 +1,13 @@
-clickDepth = 5 # how deep to browse from the rootURL
-minWait = 5 # minimum amount of time allowed between HTTP requests
-maxWait = 10 # maximum amount of time to wait between HTTP requests
-debug = False # set to True to enable useful console output
+CLICK_DEPTH = 5 # how deep to browse from the rootURL
+MIN_WAIT = 5 # minimum amount of time allowed between HTTP requests
+MAX_WAIT = 10 # maximum amount of time to wait between HTTP requests
+DEBUG = False # set to True to enable useful console output
 
 # use this single item list to test how a site responds to this crawler
 # be sure to comment out the list below it.
-#rootURLs = ["https://digg.com/"] 
+#ROOT_URLS = ["https://digg.com/"] 
 
-rootURLs = [
+ROOT_URLS = [
 	"https://digg.com/",
 	"https://www.yahoo.com",
 	"https://www.reddit.com",
@@ -45,5 +45,5 @@ blacklist = [
 	]  
 
 # must use a valid user agent or sites will hate you
-userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) ' \
+USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) ' \
 	'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36'

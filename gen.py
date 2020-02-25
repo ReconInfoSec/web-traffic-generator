@@ -13,15 +13,15 @@ try:
 	import config
 except ImportError:
 	class ConfigClass: #minimal config incase you don't have the config.py
-		clickDepth = 5 # how deep to browse from the rootURL
-		minWait = 1 # minimum amount of time allowed between HTTP requests
-		maxWait = 3 # maximum amount of time to wait between HTTP requests
-		debug = True # set to True to enable useful console output
+		CLICK_DEPTH = 5 # how deep to browse from the rootURL
+		MIN_WAIT = 1 # minimum amount of time allowed between HTTP requests
+		MAX_WAIT = 3 # maximum amount of time to wait between HTTP requests
+		DEBUG = True # set to True to enable useful console output
 
 		# use this single item list to test how a site responds to this crawler
 		# be sure to comment out the list below it.
-		#rootURLs = ["https://digg.com/"] 
-		rootURLs = [
+		#ROOT_URLS = ["https://digg.com/"] 
+		ROOT_URLS = [
 			"https://www.reddit.com"
 			]
 
@@ -33,20 +33,20 @@ except ImportError:
 			]  
 
 		# must use a valid user agent or sites will hate you
-		userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) ' \
+		USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) ' \
 			'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36'
 	config = ConfigClass 
 
-def doRequest(url):
-	global dataMeter
-	global goodRequests
-	global badRequests
-	sleepTime = random.randrange(config.minWait,config.maxWait)
+def do_request(url):
+	global data_meter
+	global good_requests
+	global bad_requests
+	sleep_time = random.randrange(config.MIN_WAIT,config.MAX_WAIT)
 	
-	if config.debug:
+	if config.DEBUG:
 		print("requesting: %s" % url)
 	
-	headers = {'user-agent': config.userAgent}
+	headers = {'user-agent': config.USER_AGENT}
 	
 	try:
 		r = requests.get(url, headers=headers, timeout=5)
@@ -56,38 +56,38 @@ def doRequest(url):
 		
 	status = r.status_code
 	
-	pageSize = len(r.content)
-	dataMeter = dataMeter + pageSize
+	page_size = len(r.content)
+	data_meter = data_meter + page_size
 
 	
-	if config.debug:
-		print("Page size: %s" % pageSize)
-		if ( dataMeter > 1000000 ):
-			print("Data meter: %s MB" % (dataMeter / 1000000))
+	if config.DEBUG:
+		print("Page size: %s" % page_size)
+		if ( data_meter > 1000000 ):
+			print("Data meter: %s MB" % (data_meter / 1000000))
 		else:
-			print("Data meter: %s bytes" % dataMeter)
+			print("Data meter: %s bytes" % data_meter)
 	
 	if ( status != 200 ):
-		badRequests+=1
-		if config.debug:
+		bad_requests+=1
+		if config.DEBUG:
 			print("Response status: %s" % r.status_code)
 		if ( status == 429 ):
-			if config.debug:
+			if config.DEBUG:
 				print("We're making requests too frequently... sleeping longer...")
-			sleepTime+=30
+			sleep_time+=30
 	else:
-		goodRequests+=1
+		good_requests+=1
 	
 	# need to sleep for random number of seconds!
-	if config.debug:
-		print("Good requests: %s" % goodRequests)
-		print("Bad reqeusts: %s" % badRequests)
-		print("Sleeping for %s seconds..." % sleepTime)
+	if config.DEBUG:
+		print("Good requests: %s" % good_requests)
+		print("Bad reqeusts: %s" % bad_requests)
+		print("Sleeping for %s seconds..." % sleep_time)
 		
-	time.sleep(sleepTime)
+	time.sleep(sleep_time)
 	return r
 
-def getLinks(page):
+def get_links(page):
 	links=[]
 
 	pattern=r"(?:href\=\")(https?:\/\/[^\"]+)(?:\")"
@@ -103,74 +103,74 @@ def getLinks(page):
 	return links
 
 def browse(urls):
-	currURL = 1
+	current_url = 1
 	for url in urls:
-		urlCount = len(urls)
+		url_count = len(urls)
 
-		page = doRequest(url)  # hit current root URL
+		page = do_request(url)  # hit current root URL
 		if page:
-			links = getLinks(page) # extract links from page
-			linkCount = len(links)
+			links = get_links(page) # extract links from page
+			link_count = len(links)
 		else:
-			if config.debug:
+			if config.DEBUG:
 				print("Error requesting %s" % url)
 			continue
 			
 			
 		depth=0
-		while ( depth < config.clickDepth ):
-			if config.debug:
+		while ( depth < config.CLICK_DEPTH ):
+			if config.DEBUG:
 				print("------------------------------------------------------")
 				print("config.blacklist: %s" % config.blacklist )
 			# set the link count, which will change throughout the loop
-			linkCount = len(links)
-			if ( linkCount > 1): # make sure we have more than 1 link to use
+			link_count = len(links)
+			if ( link_count > 1): # make sure we have more than 1 link to use
 			
-				if config.debug:
+				if config.DEBUG:
 					print("URL: %s / %s -- Depth: %s / %s" \
-						% (currURL,urlCount,depth,config.clickDepth))
-					print("Choosing random link from total: %s" % linkCount)
+						% (current_url,url_count,depth,config.CLICK_DEPTH))
+					print("Choosing random link from total: %s" % link_count)
 					
-				randomLink = random.randrange(0,linkCount - 1)
+				random_link = random.randrange(0,link_count - 1)
 				
-				if config.debug:
-					print("Link chosen: %s of %s" % (randomLink,linkCount))
+				if config.DEBUG:
+					print("Link chosen: %s of %s" % (random_link,link_count))
 					
-				clickLink = links[randomLink]
+				click_link = links[random_link]
 				
 				try:
 					# browse to random link on rootURL
-					sub_page = doRequest(clickLink)
+					sub_page = do_request(click_link)
 					if sub_page:
-						checkLinkCount = len(getLinks(sub_page))
+						check_link_count = len(get_links(sub_page))
 					else:
-						if config.debug:
+						if config.DEBUG:
 							print("Error requesting %s" % url)
 						break
 					
 					
-					checkLinkCount = len(getLinks(sub_page))
+					check_link_count = len(get_links(sub_page))
 
 					# make sure we have more than 1 link to pick from 
-					if ( checkLinkCount > 1 ):
+					if ( check_link_count > 1 ):
 						# extract links from the new page
-						links = getLinks(sub_page)
+						links = get_links(sub_page)
 					else:
 						# else retry with current link list
-						if config.debug:
+						if config.DEBUG:
 							print("Not enough links found! Found: %s  -- " \
-								"Going back up a level" % checkLinkCount)
-						config.blacklist.insert(0,clickLink)
+								"Going back up a level" % check_link_count)
+						config.blacklist.insert(0,click_link)
 						# remove the dead-end link from our list
-						del links[randomLink]
+						del links[random_link]
 				except:
-					if config.debug:
+					if config.DEBUG:
 						print("Exception on URL: %s  -- " \
-							"removing from list and trying again!" % clickLink)
+							"removing from list and trying again!" % click_link)
 					# I need to expand more on exception type for config.debugging
-					config.blacklist.insert(0,clickLink)
+					config.blacklist.insert(0,click_link)
 					# remove the dead-end link from our list
-					del links[randomLink] 
+					del links[random_link] 
 					pass
 				# increment counter whether request was successful or not 
 				# so that we don't end up in an infinite failed request loop
@@ -178,20 +178,20 @@ def browse(urls):
 			else:
 				# we land here if we went down a path that dead-ends
 				# could implement logic to simply restart at same root
-				if config.debug:
+				if config.DEBUG:
 					print("Hit a dead end...Moving to next Root URL")
-				config.blacklist.insert(0,clickLink)
-				depth = config.clickDepth 
+				config.blacklist.insert(0,click_link)
+				depth = config.CLICK_DEPTH 
 			
 		
-		currURL+=1 # increase rootURL iteration
-	if config.debug:
+		current_url+=1 # increase rootURL iteration
+	if config.DEBUG:
 		print("Done.")
 
 # initialize our global variables
-dataMeter = 0
-goodRequests = 0
-badRequests = 0
+data_meter = 0
+good_requests = 0
+bad_requests = 0
 
 while True:
 	print("Traffic generator started...")
@@ -199,9 +199,9 @@ while True:
 	print("https://github.com/ecapuano/web-traffic-generator")
 	print("")
 	print("Clicking %s links deep into %s different root URLs, " \
-		% (config.clickDepth,len(config.rootURLs)))
+		% (config.CLICK_DEPTH,len(config.ROOT_URLS)))
 	print("waiting between %s and %s seconds between requests. " \
-		% (config.minWait,config.maxWait))
+		% (config.MIN_WAIT,config.MAX_WAIT))
 	print("")
 	print("This script will run indefinitely. Ctrl+C to stop.")
-	browse(config.rootURLs)
+	browse(config.ROOT_URLS)
