@@ -7,8 +7,8 @@
 # published under MIT license :) do what you want.
 #
 #20170714 shyft ADDED python 2.7 and 3.x compatibility and generic config
-from __future__ import print_function 
-import requests, re, time, random 
+from __future__ import print_function
+import requests, re, time, random
 try:
 	import config
 except ImportError:
@@ -20,7 +20,7 @@ except ImportError:
 
 		# use this single item list to test how a site responds to this crawler
 		# be sure to comment out the list below it.
-		#rootURLs = ["https://digg.com/"] 
+		#rootURLs = ["https://digg.com/"]
 		rootURLs = [
 			"https://www.reddit.com"
 			]
@@ -30,43 +30,40 @@ except ImportError:
 		blacklist = [
 			'facebook.com',
 			'pinterest.com'
-			]  
+			]
 
 		# must use a valid user agent or sites will hate you
 		userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) ' \
 			'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36'
-	config = ConfigClass 
+	config = ConfigClass
 
 def doRequest(url):
 	global dataMeter
 	global goodRequests
 	global badRequests
 	sleepTime = random.randrange(config.minWait,config.maxWait)
-	
+
 	if config.debug:
 		print("requesting: %s" % url)
-	
+
 	headers = {'user-agent': config.userAgent}
-	
+
 	try:
 		r = requests.get(url, headers=headers, timeout=5)
 	except:
 		time.sleep(30) # else we'll enter 100% CPU loop in a net down situation
 		return False
-		
+
 	status = r.status_code
-	
+
 	pageSize = len(r.content)
 	dataMeter = dataMeter + pageSize
 
-	
+
 	if config.debug:
-		print("Page size: %s" % pageSize)
-		if ( dataMeter > 1000000 ):
-			print("Data meter: %s MB" % (dataMeter / 1000000))
-		else:
-			print("Data meter: %s bytes" % dataMeter)
-	
+		print("Page size: %s" % bytes2human(pageSize))
+		print("Data meter: %s" % bytes2human(dataMeter))
+
 	if ( status != 200 ):
 		badRequests+=1
 		if config.debug:
@@ -77,29 +74,38 @@ def doRequest(url):
 			sleepTime+=30
 	else:
 		goodRequests+=1
-	
+
 	# need to sleep for random number of seconds!
 	if config.debug:
 		print("Good requests: %s" % goodRequests)
-		print("Bad reqeusts: %s" % badRequests)
+		print("Bad requests: %s" % badRequests)
 		print("Sleeping for %s seconds..." % sleepTime)
-		
+
 	time.sleep(sleepTime)
 	return r
+
+def bytes2human(bytes):
+	power = 1024  # Change to 1000 if that is preferred
+	n = 0
+	units = {0: 'B', 1: 'KB', 2: 'MB', 3: 'GB', 4: 'TB', 5: 'PB', 6: 'EB', 7: 'ZB', 8: 'YB'}
+	while bytes > power:
+		bytes = float(bytes) / power
+		n +=1
+	return '{0:.2f} {1}'.format(bytes, units[n])
 
 def getLinks(page):
 	links=[]
 
 	pattern=r"(?:href\=\")(https?:\/\/[^\"]+)(?:\")"
-	
+
 	matches = re.findall(pattern,str(page.content))
-	
+
 	for match in matches: # check all matches against config.blacklist
 		if any(bl in match for bl in config.blacklist):
 			pass
 		else:
 			links.insert(0,match)
-		
+
 	return links
 
 def browse(urls):
@@ -115,8 +121,8 @@ def browse(urls):
 			if config.debug:
 				print("Error requesting %s" % url)
 			continue
-			
-			
+
+
 		depth=0
 		while ( depth < config.clickDepth ):
 			if config.debug:
@@ -125,19 +131,19 @@ def browse(urls):
 			# set the link count, which will change throughout the loop
 			linkCount = len(links)
 			if ( linkCount > 1): # make sure we have more than 1 link to use
-			
+
 				if config.debug:
 					print("URL: %s / %s -- Depth: %s / %s" \
 						% (currURL,urlCount,depth,config.clickDepth))
 					print("Choosing random link from total: %s" % linkCount)
-					
+
 				randomLink = random.randrange(0,linkCount - 1)
-				
+
 				if config.debug:
 					print("Link chosen: %s of %s" % (randomLink,linkCount))
-					
+
 				clickLink = links[randomLink]
-				
+
 				try:
 					# browse to random link on rootURL
 					sub_page = doRequest(clickLink)
@@ -147,11 +153,11 @@ def browse(urls):
 						if config.debug:
 							print("Error requesting %s" % url)
 						break
-					
-					
+
+
 					checkLinkCount = len(getLinks(sub_page))
 
-					# make sure we have more than 1 link to pick from 
+					# make sure we have more than 1 link to pick from
 					if ( checkLinkCount > 1 ):
 						# extract links from the new page
 						links = getLinks(sub_page)
@@ -170,9 +176,9 @@ def browse(urls):
 					# I need to expand more on exception type for config.debugging
 					config.blacklist.insert(0,clickLink)
 					# remove the dead-end link from our list
-					del links[randomLink] 
+					del links[randomLink]
 					pass
-				# increment counter whether request was successful or not 
+				# increment counter whether request was successful or not
 				# so that we don't end up in an infinite failed request loop
 				depth+=1
 			else:
@@ -181,9 +187,9 @@ def browse(urls):
 				if config.debug:
 					print("Hit a dead end...Moving to next Root URL")
 				config.blacklist.insert(0,clickLink)
-				depth = config.clickDepth 
-			
-		
+				depth = config.clickDepth
+
+
 		currURL+=1 # increase rootURL iteration
 	if config.debug:
 		print("Done.")
