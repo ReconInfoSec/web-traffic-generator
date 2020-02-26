@@ -6,6 +6,7 @@
 #
 # published under MIT license :) do what you want.
 #
+
 # 20170714 shyft ADDED python 2.7 and 3.x compatibility and generic config
 # 20200225 rarawls ADDED recursive, depth-first browsing, color stdout
 from __future__ import print_function
@@ -191,3 +192,4 @@ if __name__ == "__main__":
         depth = random.choice(range(config.MIN_DEPTH, config.MAX_DEPTH))
 
         recursive_browse(random_url, depth)
+
