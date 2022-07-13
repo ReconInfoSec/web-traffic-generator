@@ -107,7 +107,7 @@ def do_request(url):
         good_requests += 1
 
     debug_print("  Good requests: {}".format(good_requests))
-    debug_print("  Bad reqeusts: {}".format(bad_requests))
+    debug_print("  Bad requests: {}".format(bad_requests))
 
     return r
 
